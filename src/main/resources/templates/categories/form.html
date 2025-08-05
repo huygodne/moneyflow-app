@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${category.id == null ? 'Thêm Danh mục Mới' : 'Sửa Danh mục'}"></title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%);
+            min-height: 100vh;
+            padding-top: 70px;
+        }
+        .content-card {
+            background: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-bottom: 20px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .form-control:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
+        }
+        .btn-custom {
+            background-color: #3498db;
+            border: none;
+            color: #fff;
+            transition: background-color 0.3s;
+        }
+        .btn-custom:hover {
+            background-color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: main-navbar}"></div>
+
+<main class="container mx-auto p-6 pt-24 animate__animated animate__fadeInUp">
+    <div class="content-card animate__animated animate__fadeInUp">
+        <h2 th:text="${category.id == null ? 'Thêm Danh mục Mới' : 'Sửa Danh mục'}" class="text-2xl font-bold text-indigo-600 mb-4"></h2>
+
+        <form th:action="${category.id == null ? '/categories/new' : '/categories/edit/' + category.id}" th:object="${category}" method="post">
+            <input type="hidden" th:field="*{id}" />
+
+            <div class="mb-4">
+                <label for="name" class="form-label">Tên Danh mục:</label>
+                <input type="text" class="form-control" id="name" th:field="*{name}" required>
+                <small th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="text-danger"></small>
+            </div>
+
+            <div class="mb-4">
+                <label for="type" class="form-label">Loại:</label>
+                <select class="form-select" id="type" th:field="*{type}" required>
+                    <option th:each="transactionType : ${T(com.moneyflow.moneyflow.enums.TransactionType).values()}"
+                            th:value="${transactionType}" th:text="${transactionType}"></option>
+                </select>
+                <small th:if="${#fields.hasErrors('type')}" th:errors="*{type}" class="text-danger"></small>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-custom">Lưu Danh mục</button>
+                <a th:href="@{/categories}" class="btn btn-outline-secondary">Hủy</a>
+            </div>
+        </form>
+    </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Giao dịch - MoneyFlow</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%);
+            min-height: 100vh;
+            padding-top: 70px;
+        }
+        .content-card {
+            background: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .table-custom {
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .table-custom th {
+            background-color: #2c3e50;
+            color: #ffffff;
+        }
+        .table-custom tr:hover {
+            background-color: #f8f9fa;
+            transition: background-color 0.3s;
+        }
+        .btn-custom {
+            background-color: #3498db;
+            border: none;
+            transition: background-color 0.3s;
+        }
+        .btn-custom:hover {
+            background-color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+<!-- Navbar chung -->
+<div th:replace="fragments/navbar :: main-navbar"></div>
+
+<main class="container mx-auto p-6 pt-24 animate__animated animate__fadeInUp">
+    <div class="content-card animate__animated animate__fadeInUp">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="text-2xl font-bold text-indigo-600">Danh sách giao dịch</h2>
+            <a th:href="@{/transactions/new}" class="btn btn-custom">Thêm giao dịch</a>
+        </div>
+
+        <div th:if="${transactions.isEmpty()}" class="alert alert-info text-center mb-4 animate__animated animate__fadeIn">
+            Bạn chưa có giao dịch nào.
+        </div>
+        <div th:unless="${transactions.isEmpty()}" class="table-responsive animate__animated animate__fadeIn">
+            <table class="table table-striped table-hover table-custom">
+                <thead>
+                <tr>
+                    <th>Ngày</th>
+                    <th>Số tiền</th>
+                    <th>Loại</th>
+                    <th>Danh mục</th>
+                    <th>Ví</th>
+                    <th>Mô tả</th>
+                    <th>Hành động</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="tx : ${transactions}">
+                    <td th:text="${#temporals.format(tx.transactionDate, 'dd/MM/yyyy HH:mm')}"></td>
+                    <td th:text="${numberFormatter.formatBigDecimal(tx.amount) + ' VND'}"></td>
+                    <td th:text="${tx.type}"></td>
+                    <td th:text="${tx.category != null ? tx.category.name : 'N/A'}"></td>
+                    <td th:text="${tx.account != null ? tx.account.name : 'N/A'}"></td>
+                    <td th:text="${tx.description}"></td>
+                    <td>
+                        <a th:href="@{/transactions/edit/{id}(id=${tx.id})}" class="btn btn-sm btn-info me-2">Sửa</a>
+                        <form th:action="@{/transactions/delete/{id}(id=${tx.id})}" method="post" class="d-inline">
+                            <input type="hidden" name="_method" value="delete" />
+                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Bạn có chắc chắn muốn xóa giao dịch này không?');">Xóa</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

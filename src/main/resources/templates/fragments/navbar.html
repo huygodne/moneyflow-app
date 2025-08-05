@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Navbar Fragment</title>
+    <style>
+        .navbar-dark .navbar-nav .nav-link { color: #bbb; }
+        .navbar-dark .nav-link.active, .navbar-dark .nav-link:hover { color: #fff !important; }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand navbar-dark bg-gradient-to-r from-indigo-900 via-purple-900 to-pink-900 fixed-top py-3 px-4 d-flex align-items-center shadow-lg animate__animated animate__slideInDown" th:fragment="main-navbar">
+    <div class="container-fluid">
+        <a class="navbar-brand text-white" th:href="@{/}">MoneyFlow</a>
+        <!-- Always expanded: menu visible by default -->
+        <div class="navbar-collapse show d-flex justify-content-between">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/}" th:classappend="${currentPage=='home'}? ' active'">Trang chủ</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/transactions}" th:classappend="${currentPage=='transactions'}? ' active'">Giao dịch</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/accounts}" th:classappend="${currentPage=='accounts'}? ' active'">Ví của tôi</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/categories}" th:classappend="${currentPage=='categories'}? ' active'">Danh mục</a>
+                </li>
+<!--                <li class="nav-item d-flex align-items-center" sec:authorize="isAuthenticated()">-->
+<!--                    <a class="nav-link text-white px-3 disabled" href="#">Chào mừng, <span sec:authentication="principal.fullName">Người dùng</span>!</a>-->
+<!--                </li>-->
+            </ul>
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item d-flex align-items-center" sec:authorize="isAuthenticated()">
+                    <a class="nav-link disabled px-3 text-white" href="#">Chào mừng, <span sec:authentication="principal.fullName">Người dùng</span>!</a>
+                </li>
+                <li class="nav-item" sec:authorize="isAuthenticated()">
+                    <form th:action="@{/logout}" method="post" class="d-inline-flex">
+                        <button class="btn btn-outline-light" type="submit">Đăng xuất</button>
+                    </form>
+                </li>
+                <li class="nav-item" sec:authorize="!isAuthenticated()">
+                    <a class="nav-link text-white" th:href="@{/login}">Đăng nhập</a>
+                </li>
+                <li class="nav-item" sec:authorize="!isAuthenticated()">
+                    <a class="btn btn-primary ms-2" th:href="@{/register}">Đăng ký</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+</body>
+</html>
