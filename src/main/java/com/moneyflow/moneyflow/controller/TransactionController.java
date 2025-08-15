@@ -9,6 +9,11 @@ import com.moneyflow.moneyflow.service.AccountService;
 import com.moneyflow.moneyflow.service.CategoryService;
 import com.moneyflow.moneyflow.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,6 +24,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import jakarta.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Controller
@@ -39,16 +45,24 @@ public class TransactionController {
         this.userService = userService;
     }
 
-    // Hiển thị danh sách giao dịch
     @GetMapping
     @PreAuthorize("isAuthenticated()")
-    public String listTransactions(Model model, @ModelAttribute("message") String message, @ModelAttribute("errorMessage") String errorMessage) {
+    public String listTransactions(
+            Model model,
+            @RequestParam(defaultValue = "0") int page, // trang hiện tại
+            @ModelAttribute("message") String message,
+            @ModelAttribute("errorMessage") String errorMessage) {
+
         User currentUser = userService.getCurrentUser();
         if (currentUser == null) {
             return "redirect:/login";
         }
-        List<Transaction> transactions = transactionService.getTransactionsByUser(currentUser);
-        model.addAttribute("transactions", transactions);
+
+        int pageSize = 10;
+        Pageable pageable = PageRequest.of(page, pageSize, Sort.by("transactionDate").descending());
+
+        Page<Transaction> transactionsPage = transactionService.getTransactionsByUser(currentUser, pageable);
+        model.addAttribute("transactionsPage", transactionsPage);
 
         if (message != null && !message.isEmpty()) {
             model.addAttribute("message", message);
@@ -59,6 +73,7 @@ public class TransactionController {
         model.addAttribute("currentPage", "transactions");
         return "transactions/list";
     }
+
 
     // Hiển thị form thêm giao dịch mới
     @GetMapping("/new")
@@ -237,5 +252,16 @@ public class TransactionController {
             return "redirect:/login";
         }
         return "redirect:/transactions";
+    }
+
+    @GetMapping("/api/expenses-by-category")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<List<Map<String, Object>>> getExpensesByCategory() {
+        User currentUser = userService.getCurrentUser();
+        if (currentUser == null) {
+            return ResponseEntity.status(401).body(null);
+        }
+        List<Map<String, Object>> expenses = transactionService.getExpensesByCategory();
+        return ResponseEntity.ok(expenses);
     }
 }
